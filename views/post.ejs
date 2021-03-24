@@ -6,5 +6,32 @@
     <p>
         <%=content%>
     </p>
+    <button class="btn" id="<%=postId%>">delete</button>
+
+    <script>
+
+        btn = document.getElementsByTagName('button')[0];
+        console.log(btn);
+
+
+        let del = () => {
+            console.log("Deleting");
+
+            const xhttp = new XMLHttpRequest();
+
+            xhttp.open("DELETE", `/post/${btn.id}`, true);
+            xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhttp.send();
+
+            xhttp.onreadystatechange = function () {
+                console.log(this.status)
+                if (this.readyState == 4 && this.status == 200) {
+                    window.location = "/";
+                }
+            }
+        }
+        btn.addEventListener("click", del);
+
+    </script>
 
     <%- include("partials/footer"); -%>

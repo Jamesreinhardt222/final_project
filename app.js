@@ -53,7 +53,6 @@ app.post("/compose", (req, res) => {
 });
 
 app.get("/posts/:postId", (req, res) => {
-    console.log(req.params.postId);
     const requestedPostId = req.params.postId;
 
     let sql_query = `SELECT * FROM posts where postID = ${requestedPostId}`;
@@ -64,7 +63,8 @@ app.get("/posts/:postId", (req, res) => {
         let post = result[0];
         res.render("post", {
             title: post.title,
-            content: post.content
+            content: post.content,
+            postId: post.postID
         });
     });
 });
@@ -76,6 +76,20 @@ app.get("/about", (req, res) => {
 app.get("/contact", (req, res) => {
     res.render("contact", { contactContent: aboutContent });
 });
+
+app.delete("/post/:postId", (req, res) => {
+    const requestedPostId = req.params.postId;
+    // let sql_query = `SELECT * FROM posts where postID = ${requestedPostId}`;
+
+    let sql_query = `DELETE FROM posts where postID = ${requestedPostId}`;
+    connection.query(sql_query, (err, result) => {
+        if (err) throw err;
+        console.log("Delete call reached with id = " + requestedPostId);
+        req.method = "GET";
+        res.redirect(303, "/");
+    });
+
+})
 
 
 app.listen(8888, () => {
