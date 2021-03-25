@@ -1,0 +1,17 @@
+<%- include("partials/header"); -%>
+    <h1>Update Post</h1>
+
+    <form action="/update/<%=postId%>" method="post">
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" class="form-control" name="postTitle" value="<%=title%>">
+
+            <label>Post</label>
+            <textarea name="postBody" class="form-control" cols="30" rows="5"><%=content%></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit" name="button">Update</button>
+    </form>
+
+
+
+    <%- include("partials/footer"); -%>

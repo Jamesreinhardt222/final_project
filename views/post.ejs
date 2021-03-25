@@ -6,23 +6,19 @@
     <p>
         <%=content%>
     </p>
-    <button class="btn" id="<%=postId%>">delete</button>
+    <button class="btn btn-secondary" name="<%=postId%>">Update</button>
+
+    <button class="btn btn-danger" name="<%=postId%>">delete</button>
 
     <script>
-
-        btn = document.getElementsByTagName('button')[0];
-        console.log(btn);
-
-
+        update_btn = document.getElementsByTagName('button')[0];
+        delete_btn = document.getElementsByTagName('button')[1];
         let del = () => {
             console.log("Deleting");
-
             const xhttp = new XMLHttpRequest();
-
-            xhttp.open("DELETE", `/post/${btn.id}`, true);
+            xhttp.open("DELETE", `/delete/${delete_btn.name}`, true);
             xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhttp.send();
-
             xhttp.onreadystatechange = function () {
                 console.log(this.status)
                 if (this.readyState == 4 && this.status == 200) {
@@ -30,7 +26,10 @@
                 }
             }
         }
-        btn.addEventListener("click", del);
+        delete_btn.addEventListener("click", del);
+        update_btn.addEventListener("click", () => {
+            window.location = `/update/${update_btn.name}`;
+        });
 
     </script>
 
