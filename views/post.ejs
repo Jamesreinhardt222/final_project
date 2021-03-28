@@ -14,9 +14,8 @@
         update_btn = document.getElementsByTagName('button')[0];
         delete_btn = document.getElementsByTagName('button')[1];
         let del = () => {
-            console.log("Deleting");
             const xhttp = new XMLHttpRequest();
-            xhttp.open("DELETE", `/delete/${delete_btn.name}`, true);
+            xhttp.open("DELETE", `/API/V1/delete/${delete_btn.name}`, true);
             xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhttp.send();
             xhttp.onreadystatechange = function () {

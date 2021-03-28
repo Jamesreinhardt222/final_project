@@ -1,15 +1,35 @@
 <%- include("partials/header"); -%>
     <h1>Compose Post</h1>
-    <form action="/compose" method="post">
-        <div class="form-group">
-            <label>Title</label>
-            <input type="text" class="form-control" name="postTitle">
+    <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="title" class=" form-control" name="postTitle">
 
-            <label>Post</label>
-            <textarea name="postBody" class="form-control" cols="30" rows="5"></textarea>
-        </div>
-        <button class="btn btn-primary" type="submit" name="button">Publish</button>
-    </form>
+        <label>Post</label>
+        <textarea id="content" name="postBody" class="form-control" cols="30" rows="5"></textarea>
+    </div>
+    <button class="btn btn-primary" id="submit" type="submit" name="button">Publish</button>
+
+    <script>
+        let add_post = () => {
+            console.log("Called");
+            let title = document.getElementById("title").value
+            let content = document.getElementById("content").value
+
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("POST", `/API/V1/compose`, true);
+            xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhttp.send(`postTitle=${title}&postBody=${content}`);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    window.location = "/";
+                }
+            }
+        }
+        submit_btn = document.getElementById("submit");
+        submit_btn.addEventListener("click", add_post)
+
+
+    </script>
 
 
     <%- include("partials/footer"); -%>

@@ -5,6 +5,8 @@ const mysql = require("mysql");
 const path = require("path");
 const app = express();
 
+const api_endpoint = "/API/V1"
+
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
@@ -25,23 +27,29 @@ const connection = mysql.createConnection({
 });
 
 
-const homeStartingContent = "Voluptate amet sunt cupidatat sit proident ea deserunt consectetur. Non ullamco pariatur ex ipsum occaecat ex cupidatat magna anim irure irure laborum. In consectetur Lorem consequat deserunt et nisi enim incididunt. Mollit qui culpa nisi Lorem magna qui duis non. Magna cillum proident quis velit. Et non sit eiusmod mollit consequat consectetur."
-const aboutContent = "Adipisicing ea duis ad reprehenderit qui enim voluptate id ut in nulla adipisicing elit esse. Minim id ut duis cillum fugiat sit laborum officia commodo ea. Proident excepteur nostrud ad officia pariatur eiusmod excepteur duis laboris officia consequat. Cillum minim esse laborum duis. Ea aliquip tempor mollit magna. Est laborum tempor ipsum et consequat ea sit incididunt. Pariatur consectetur consequat non magna ea dolore cillum magna elit do culpa."
-const contactContent = "Laborum nisi magna nisi sunt ipsum incididunt exercitation. Nostrud amet sint proident aliqua. Esse ex in ipsum dolor consequat eu ex minim aute quis. Mollit in fugiat ex mollit est. In do qui non ut elit ullamco fugiat quis."
+const homeStartingContent = "Welcome to the Internet Software Architecture Blog Site!!."
+const aboutContent = "This is a site designed to demonstrate superior web architecture and CRUD technology."
+const contactContent = "You can contact us by emailing the dean of BCIT.  He knows our number."
 
+
+let logged_in = false;
 
 
 app.get("/", (req, res) => {
-    let sql_query = `SELECT * FROM posts`;
 
-    connection.query(sql_query, (err, result, fields) => {
-        if (err) throw err;
-        posts = result;
-        res.render("home", {
-            startingContent: homeStartingContent,
-            posts: posts
-        });
-    })
+    if (logged_in) {
+        let sql_query = `SELECT * FROM posts`;
+        connection.query(sql_query, (err, result, fields) => {
+            if (err) throw err;
+            posts = result;
+            res.render("home", {
+                startingContent: homeStartingContent,
+                posts: posts
+            });
+        })
+    } else {
+        res.render("login", { message: "" });
+    }
 });
 
 
@@ -49,7 +57,7 @@ app.get("/compose", (req, res) => {
     res.render("compose");
 });
 
-app.post("/compose", (req, res) => {
+app.post(api_endpoint + "/compose", (req, res) => {
     let sql_query = `INSERT into posts (title, content) VALUES ("${req.body.postTitle}", "${req.body.postBody}");`;
 
     connection.query(sql_query, (err, result) => {
@@ -63,7 +71,7 @@ app.get("/about", (req, res) => {
 });
 
 app.get("/contact", (req, res) => {
-    res.render("contact", { contactContent: aboutContent });
+    res.render("contact", { contactContent: contactContent });
 });
 
 app.get("/posts/:postId", (req, res) => {
@@ -97,7 +105,7 @@ app.get("/update/:postId", (req, res) => {
     });
 });
 
-app.delete("/delete/:postId", (req, res) => {
+app.delete(api_endpoint + "/delete/:postId", (req, res) => {
     const requestedPostId = req.params.postId;
 
     let sql_query = `DELETE FROM posts where postID = ${requestedPostId}`;
@@ -110,11 +118,11 @@ app.delete("/delete/:postId", (req, res) => {
 
 })
 
-app.post("/update/:postId", (req, res) => {
+app.post(api_endpoint + "/update/:postId", (req, res) => {
     const requestedPostId = req.params.postId;
 
-
-    let sql_query = `UPDATE posts set title="${req.body.postTitle}", content="${req.body.postBody}" where postID = ${requestedPostId}`;
+    let sql_query = `UPDATE posts set title="${req.body.postTitle}", content="${req.body.postBody}" where postID=${requestedPostId};`;
+    // 'UPDATE posts set title="Dogs", content="I love Hyenas, but I love lions more" where postID = 27"'
     connection.query(sql_query, (err, result) => {
         if (err) throw err;
         req.method = "GET"
@@ -122,8 +130,41 @@ app.post("/update/:postId", (req, res) => {
     });
 });
 
+app.get("/logout", (req, res) => {
+    logged_in = false;
+    res.redirect("/");
+})
 
 
+app.get("/register", (req, res) => {
+    res.render("register");
+});
+
+app.post("/register", (req, res) => {
+    let sql_query = `INSERT into Users (email, hashedPassword) VALUES ("${req.body.username}", "${req.body.password}");`;
+
+    connection.query(sql_query, (err, result) => {
+        if (err) throw err;
+        logged_in = true
+        res.redirect("/");
+    });
+});
+
+app.post("/login", (req, res) => {
+    let sql_query = `SELECT * from Users where email = "${req.body.username}";`;
+
+    connection.query(sql_query, (err, result) => {
+        if (err) throw err;
+        if (result[0]["hashedPassword"] == req.body.password) {
+            logged_in = true;
+            res.redirect("/");
+        } else {
+            res.render("login", {
+                message: "Incorrect email or password."
+            })
+        }
+    });
+});
 
 
 app.listen(8888, () => {

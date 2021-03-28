@@ -8,3 +8,20 @@ CREATE table posts(
 INSERT INTO posts (title, content) 
 VALUES ("First Post here", 
 "Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah.... Blah Blah Blah");
+
+
+
+CREATE TABLE Users (
+    userID int AUTO_INCREMENT,
+    email varchar(255) NOT NULL,
+    hashedPassword varchar(255) NOT NULL,
+    PRIMARY KEY(userID)
+);
+
+
+CREATE TABLE UserPosts (
+    id int AUTO_INCREMENT,
+    userID int NOT NULL REFERENCES Users(userID),
+    postID int NOT NULL REFERENCES Posts(postID),
+    PRIMARY KEY(id)
+);

@@ -1,17 +1,33 @@
 <%- include("partials/header"); -%>
     <h1>Update Post</h1>
 
-    <form action="/update/<%=postId%>" method="post">
-        <div class="form-group">
-            <label>Title</label>
-            <input type="text" class="form-control" name="postTitle" value="<%=title%>">
+    <div class="form-group">
+        <label>Title</label>
+        <input id="title" type="text" class="form-control" name="postTitle" value="<%=title%>">
 
-            <label>Post</label>
-            <textarea name="postBody" class="form-control" cols="30" rows="5"><%=content%></textarea>
-        </div>
-        <button class="btn btn-primary" type="submit" name="button">Update</button>
-    </form>
+        <label>Post</label>
+        <textarea id="content" name="postBody" class="form-control" cols="30" rows="5"><%=content%></textarea>
+    </div>
+    <button class="btn btn-primary" id="submit" type="submit" name="button">Update</button>
 
+    <script>
+        let update_post = () => {
+            let title = document.getElementById("title").value
+            let content = document.getElementById("content").value
+
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("POST", `/API/V1/update/<%=postId%>`, true);
+            xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhttp.send(`postTitle=${title}&postBody=${content}`);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    window.location = "/";
+                }
+            }
+        }
+        update_btn = document.getElementById("submit");
+        update_btn.addEventListener("click", update_post)
+    </script>
 
 
     <%- include("partials/footer"); -%>
