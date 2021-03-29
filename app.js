@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs")
@@ -6,7 +7,10 @@ const path = require("path");
 const app = express();
 
 const api_endpoint = "/API/V1"
+let user = {};
 
+
+console.log(process.env.SECRET);
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
@@ -38,7 +42,7 @@ let logged_in = false;
 app.get("/", (req, res) => {
 
     if (logged_in) {
-        let sql_query = `SELECT * FROM posts`;
+        let sql_query = `SELECT * FROM posts join UserPosts on (posts.postID = UserPosts.postID) where UserPosts.userID = ${user.userID}`;
         connection.query(sql_query, (err, result, fields) => {
             if (err) throw err;
             posts = result;
@@ -59,8 +63,12 @@ app.get("/compose", (req, res) => {
 
 app.post(api_endpoint + "/compose", (req, res) => {
     let sql_query = `INSERT into posts (title, content) VALUES ("${req.body.postTitle}", "${req.body.postBody}");`;
-
     connection.query(sql_query, (err, result) => {
+        if (err) throw err;
+    });
+    // let second_sql_query = "SELECT LAST_INSERT_ID() from posts ORDER BY postID DESC LIMIT 0,1; Set @num := LAST_INSERT_ID(); "
+    let second_sql_query = `INSERT into UserPosts (userID, postID) VALUES ("${user.userID}", LAST_INSERT_ID());`;
+    connection.query(second_sql_query, (err, result) => {
         if (err) throw err;
         res.redirect("/");
     });
@@ -155,14 +163,17 @@ app.post("/login", (req, res) => {
 
     connection.query(sql_query, (err, result) => {
         if (err) throw err;
-        if (result[0]["hashedPassword"] == req.body.password) {
-            logged_in = true;
-            res.redirect("/");
-        } else {
-            res.render("login", {
-                message: "Incorrect email or password."
-            })
-        }
+        if (result.length > 0) {
+            if (result[0]["hashedPassword"] == req.body.password) {
+                logged_in = true;
+                user = result[0];
+                res.redirect("/");
+            } else {
+                res.render("login", {
+                    message: "Incorrect email or password."
+                })
+            }
+        };
     });
 });
 
