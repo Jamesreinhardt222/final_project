@@ -1,27 +1,22 @@
-CREATE table posts(
-	postID int AUTO_INCREMENT,
-    title varchar(1000),
-	content varchar(1000),
-	PRIMARY KEY(postID)
-);
-
-INSERT INTO posts (title, content) 
-VALUES ("First Post here", 
-"Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah.... Blah Blah Blah");
-
 
 
 CREATE TABLE Users (
-    userID int AUTO_INCREMENT,
-    email varchar(255) NOT NULL,
+    userID varchar(255) NOT NULL PRIMARY KEY,
     hashedPassword varchar(255) NOT NULL,
-    PRIMARY KEY(userID)
+    token varchar(255)
 );
 
+CREATE TABLE Posts (
+    postID int NOT NULL PRIMARY KEY,
+    userID varchar(255) NOT NULL,
+    title varchar(255) NOT NULL,
+    post varchar(65535) NOT NULL,
+    FOREIGN KEY (userID) REFERENCES Users(userID)
+);
 
-CREATE TABLE UserPosts (
-    id int AUTO_INCREMENT,
-    userID int NOT NULL REFERENCES Users(userID),
-    postID int NOT NULL REFERENCES Posts(postID),
-    PRIMARY KEY(id)
+CREATE TABLE Stats (
+    statID int NOT NULL PRIMARY KEY,
+    method varchar(255) NOT NULL,
+    endpoint varchar(255) NOT NULL,
+    requests int NOT NULL
 );

@@ -119,31 +119,12 @@ getStats = async () => {
     console.log("getStats:", await response.json());
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 async function main() {
     await createUser();          // doesnt need a token
     await getUsers();            // doesnt need a token
     token = await login();       // doesnt need a token
     await updateUserPassword();
+    await logout();
 
     let postID = await createPost();
     await getPosts();            // doesnt need a token
@@ -152,7 +133,7 @@ async function main() {
 
     await getStats();
 
-    await deleteUser();
+    // await deleteUser();
     // await logout();
 }
 
